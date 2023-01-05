@@ -13,6 +13,6 @@
 
 ## Dev
 
-1. `uvicorn main:app --reload`
+1. `uvicorn app.main:app --reload`
 
 
