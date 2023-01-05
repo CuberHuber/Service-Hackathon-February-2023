@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "service"
+version = "0.1.0"
+description = ""
+authors = ["Roman <komogvr@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.88.0"
+httpx = "^0.23.3"
+sqlalchemy = "^1.4.46"
+uvicorn = "^0.20.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
