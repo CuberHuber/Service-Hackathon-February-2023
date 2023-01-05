@@ -42,7 +42,8 @@ def get_external_services(db: Session, skip: int = 0, limit: int = 100):
 
 def get_external_service_by_phone_zone(db: Session, phone: str):
     """ Дописать нахождение сервиса по номеру зоны"""
-    pass
+    db_service = db.query(models.PhoneZoneExternalService, models.ExternalService).join(models.ExternalService).filter(models.PhoneZoneExternalService.template == phone).first()
+    return db_service
 
 
 def get_external_service_by_ip(db: Session, ip: str):
