@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from ..config import Settings
 import httpx
 from ..database import get_db, crud, schemas
+import re
 
 router = APIRouter(
     prefix="/clients",
@@ -25,18 +26,18 @@ class Client(Action):
 
 
 class ActionResponse(Action):
-    resp: str
+    resp: bool
+    comment: str
     is_service: bool
 
 
-def action_request(host: str, action: Client) -> Response | None:
-    with httpx.Client(base_url=host, timeout=httpx.Timeout(1.0, connect=2.0)) as client:
-        print(host, action)
-        try:
-            resp: Response = client.request("GET", url=Settings().ex_service_check_action_url, json=action)
+def action_request(host: str, action: Client) -> Response:
+    try:
+        with httpx.Client(base_url='http://' + host, timeout=0.2) as client:
+            resp = client.get(url=Settings().ex_service_check_action_url + f'{action.phone}')
             return resp
-        except:
-            return None
+    except httpx.TimeoutException:
+        return Response(404)
 
 
 @router.get("/", response_model=list[schemas.Client])
@@ -66,10 +67,16 @@ def check_action(action: Action, db: Session = Depends(get_db)):
     client = crud.get_client(db=db, client_id=action.client_id)
     db_service = crud.get_external_service_by_phone_zone(db=db, phone=action.action_phone)
     if db_service:
-        resp = action_request(db_service.__dict__['ip'], Client(**action.dict(), phone=client.__dict__['phone']))
-        if resp:
-            return ActionResponse(**action.dict(), resp=resp, is_service=True)
-        else:
-            return ActionResponse(**action.dict(), resp="NON", is_service=True)
+        if re.match(r'^([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,4})(:[0-9]{1,4})?$', db_service.__dict__['ip']):
+            resp = action_request(db_service.__dict__['ip'], Client(**action.dict(), phone=client.__dict__['phone']))
+            if resp.status_code == 200:
+                try:
+                    check_resp: bool = resp.json()['check']
+                except:
+                    check_resp: bool = False
+                return ActionResponse(**action.dict(), resp=check_resp, comment=("OK" if check_resp else 'NO'),
+                                      is_service=True)
+
+        return ActionResponse(**action.dict(), resp=False, comment="NON", is_service=True)
     else:
-        return ActionResponse(**action.dict(), resp="NON", is_service=False)
+        return ActionResponse(**action.dict(), resp=False, comment="NON", is_service=False)

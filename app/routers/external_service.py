@@ -9,13 +9,6 @@ router = APIRouter(
 )
 
 
-# @router.post("/", response_model=schemas.Client)
-# def create_client(client: schemas.ClientCreate, db: Session = Depends(get_db)):
-#     db_user = crud.get_client_by_phone_number(db, phone=client.phone)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="Phone already registered")
-#     return crud.create_client(db=db, client=client)
-
 @router.get("/", response_model=list[schemas.ExternalService])
 def read_clients(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     services = crud.get_external_services(db, skip=skip, limit=limit)
