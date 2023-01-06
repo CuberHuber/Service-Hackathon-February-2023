@@ -6,11 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from ..config import Settings
 
-# Понять причину ошибки
-def setting(): return Settings()
 
-
-SQLALCHEMY_DATABASE_URL = "sqlite:///databases/localService.sqlite"
+SQLALCHEMY_DATABASE_URL = "sqlite:///"+str(Settings().database_name)
+print(SQLALCHEMY_DATABASE_URL)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

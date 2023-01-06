@@ -66,7 +66,7 @@ def check_action(action: Action, db: Session = Depends(get_db)):
     client = crud.get_client(db=db, client_id=action.client_id)
     db_service = crud.get_external_service_by_phone_zone(db=db, phone=action.action_phone)
     if db_service:
-        resp = action_request(db_service[1].__dict__['ip'], Client(**action.dict(), phone=client.__dict__['phone']))
+        resp = action_request(db_service.__dict__['ip'], Client(**action.dict(), phone=client.__dict__['phone']))
         if resp:
             return ActionResponse(**action.dict(), resp=resp, is_service=True)
         else:

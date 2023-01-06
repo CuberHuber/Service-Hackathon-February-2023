@@ -8,4 +8,5 @@ class Settings(BaseSettings):
     ex_service_check_action_url: str
 
     class Config:
-        env_file = f"{pathlib.Path(__file__).resolve().parent}/.env"
+        env_file = rf"{pathlib.Path(__file__).resolve().parent.parent}/.env"
+        print(env_file)
