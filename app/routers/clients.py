@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
-from fastapi.encoders import jsonable_encoder
 from httpx import Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -13,6 +12,8 @@ router = APIRouter(
     tags=["clients"],
     responses={404: {"description": "Not found"}},
 )
+
+HOST_REGEX = r'^(http(s)?://)(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})(:\d{1,4})?$'
 
 
 class Action(BaseModel):
@@ -33,7 +34,7 @@ class ActionResponse(Action):
 
 def action_request(host: str, action: Client) -> Response:
     try:
-        with httpx.Client(base_url='http://' + host, timeout=0.2) as client:
+        with httpx.Client(base_url=host, timeout=0.2) as client:
             resp = client.get(url=Settings().ex_service_check_action_url + f'{action.phone}')
             return resp
     except httpx.TimeoutException:
@@ -67,8 +68,10 @@ def check_action(action: Action, db: Session = Depends(get_db)):
     client = crud.get_client(db=db, client_id=action.client_id)
     db_service = crud.get_external_service_by_phone_zone(db=db, phone=action.action_phone)
     if db_service:
-        if re.match(r'^([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,4})(:[0-9]{1,4})?$', db_service.__dict__['ip']):
-            resp = action_request(db_service.__dict__['ip'], Client(**action.dict(), phone=client.__dict__['phone']))
+        s_ip = db_service.__dict__['ip']
+        s_phone = client.__dict__['phone']
+        if re.match(HOST_REGEX, s_ip):
+            resp = action_request(s_ip, Client(**action.dict(), phone=s_phone))
             if resp.status_code == 200:
                 try:
                     check_resp: bool = resp.json()['check']
