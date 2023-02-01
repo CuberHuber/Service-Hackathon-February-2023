@@ -12,6 +12,8 @@ httpx = "^0.23.3"
 sqlalchemy = "^1.4.46"
 uvicorn = "^0.20.0"
 pydantic = {extras = ["dotenv"], version = "^1.10.4"}
+tomli = "^2.0.1"
+platformdirs = "^2.6.2"
 
 
 [build-system]
