@@ -12,3 +12,6 @@ docker-compose:
 startup-new-db: create-db docker-compose
 
 start: docker-compose
+
+local-dev: venv
+	uvicorn app.main:app

@@ -1,18 +1,13 @@
 from functools import lru_cache
 
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 
-# from .dependencies import *
-from .routers import clients, external_service, phone_zones
 from .config import Settings
-
-# app = FastAPI(dependencies=[Depends(*)])
+from .routers import v1
 
 app = FastAPI()
 
-app.include_router(clients.router)
-app.include_router(external_service.router)
-app.include_router(phone_zones.router)
+app.include_router(v1.router)
 
 
 @lru_cache()
@@ -22,4 +17,4 @@ def get_settings():
 
 @app.get("/")
 async def root():
-    return {"message": "Hello Bigger Applications!"}
+    return {"message": "Hello. It's a UVC - unified verification center"}
