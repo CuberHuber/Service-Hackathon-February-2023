@@ -18,7 +18,7 @@
 1. install [docker desktop](https://www.docker.com/get-started/)
 2. enable [wsl2](https://pureinfotech.com/install-windows-subsystem-linux-2-windows-10/)
 3. Перейти в корень проекта
-4. Нужно создать базу данных перед запуском docker'а. Для этого [запустить](readme.md:9)
+4. Нужно создать базу данных перед запуском docker'а. Для этого [запустить](readme.md#9)
 5. `docker-compose build`
 6. `docker-compose up`
 
