@@ -11,4 +11,4 @@ docker-compose:
 
 startup-new-db: create-db docker-compose
 
-startup: docker-compose
+start: docker-compose

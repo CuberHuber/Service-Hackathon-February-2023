@@ -11,3 +11,10 @@ services:
     volumes:
       - "./databases/TestService.sample:/code/databases/localService.sqlite"
     command: uvicorn app.main:app --host 0.0.0.0 --port 80
+  external_service:
+    build:
+      context: ../ExternalService/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8081:80"
